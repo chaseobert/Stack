@@ -6,6 +6,6 @@
 // You can also leave the placeholders in place and enter the values in the
 // app's Setup screen instead; they are then stored only in that browser.
 window.STACK_CONFIG = {
-  SUPABASE_URL: "YOUR_SUPABASE_URL",
-  SUPABASE_ANON_KEY: "YOUR_SUPABASE_ANON_KEY"
+  SUPABASE_URL: "https://hxjfsshhwnuujoeqhqkd.supabase.co",
+  SUPABASE_ANON_KEY: "sb_publishable_fzaN7Xh6Z3s3GBIKfXhqsA_bzcTKfgX"
 };
