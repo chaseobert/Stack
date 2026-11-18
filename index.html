@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stack — spending, income, and investing, all in one place</title>
+<meta name="description" content="Stack — build your stack of spending, income, and investing, all in one place. Free, for a small group of friends and family.">
+<link rel="stylesheet" href="styles.css">
+<script src="config.js"></script>
+</head>
+<body>
+<header>
+  <h1>Stack</h1>
+  <p class="tagline">Stack — build your stack of spending, income, and investing, all in one place.</p>
+  <div class="authbar" id="authbar"><span>Loading…</span></div>
+</header>
+<nav class="tabs" id="tabs" aria-label="Stack sections">
+  <button data-tab="overview" class="active">Overview</button>
+  <button data-tab="spending">Spending</button>
+  <button data-tab="portfolio">Portfolio</button>
+  <button data-tab="income">Income</button>
+  <button data-tab="goals">Goals</button>
+  <button data-tab="reports">Reports</button>
+  <button data-tab="setup">Setup</button>
+</nav>
+<main>
+  <div id="global-error" class="error" hidden></div>
+  <div id="global-notice" class="notice" hidden></div>
+
+  <section class="tab active" id="tab-overview">
+    <div class="card">
+      <h2>Overview</h2>
+      <p class="muted" id="overview-period">This month</p>
+      <div class="row no-print">
+        <div><label for="overview-month">Month</label><input type="month" id="overview-month"></div>
+        <div><button class="secondary" id="overview-prev">← Prev month</button></div>
+        <div><button class="secondary" id="overview-next">Next month →</button></div>
+      </div>
+      <div class="grid" style="margin-top:14px">
+        <div class="stat"><div class="label">Kept this month</div><div class="value" id="ov-kept">—</div><div class="muted" id="ov-kept-note">Income − spending, ex-investments</div></div>
+        <div class="stat"><div class="label">Income this month</div><div class="value" id="ov-income">—</div></div>
+        <div class="stat"><div class="label">Spent this month</div><div class="value" id="ov-spent">—</div><div class="muted">ex-investments</div></div>
+        <div class="stat"><div class="label">Invested this month</div><div class="value" id="ov-invested">—</div></div>
+        <div class="stat"><div class="label">Gas this month</div><div class="value" id="ov-gas">—</div></div>
+        <div class="stat"><div class="label">Portfolio this month</div><div class="value" id="ov-portfolio">—</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Year to date</h2>
+      <div class="grid">
+        <div class="stat"><div class="label">Income YTD</div><div class="value" id="ytd-income">$0.00</div></div>
+        <div class="stat"><div class="label">Spent YTD</div><div class="value" id="ytd-spent">$0.00</div><div class="muted">ex-investments</div></div>
+        <div class="stat"><div class="label">Invested YTD</div><div class="value" id="ytd-invested">$0.00</div></div>
+        <div class="stat"><div class="label">Kept YTD</div><div class="value" id="ytd-kept">$0.00</div></div>
+        <div class="stat"><div class="label">Portfolio YTD</div><div class="value" id="ytd-portfolio">$0.00</div></div>
+        <div class="stat"><div class="label">Gas YTD</div><div class="value" id="ytd-gas">$0.00</div></div>
+      </div>
+      <p class="muted">Kept = income − spending, not counting investments as spending. Invested money is shown separately — Kept includes it, so cash left = Kept − Invested.</p>
+    </div>
+    <div class="card">
+      <h2>Total profit / loss — all time</h2>
+      <div class="big" id="alltime-pl">$0.00</div>
+      <p class="muted">Income − spending ex-investments, all time. Invested all time: <span id="alltime-invested">$0.00</span> (shown separately, not counted as an expense).</p>
+    </div>
+    <div class="card">
+      <h2>Month by month</h2>
+      <div id="month-table"><p class="empty">No months yet — add spending, income, or daily gains and months will appear here.</p></div>
+    </div>
+  </section>
+
+  <section class="tab" id="tab-spending">
+    <div class="card">
+      <h2>Add spending</h2>
+      <form id="expense-form">
+        <div class="row">
+          <div><label for="exp-date">Date</label><input type="date" id="exp-date" required></div>
+          <div><label for="exp-label">Label</label><input id="exp-label" placeholder="e.g. Gas" required></div>
+          <div><label for="exp-amount">Amount ($)</label><input type="number" id="exp-amount" step="0.01" min="0" required></div>
+        </div>
+        <div class="row">
+          <div><label for="exp-kind">Type</label><select id="exp-kind"><option value="expense">Spending</option><option value="investment">Investment transfer</option></select></div>
+          <div><label for="exp-category">Category</label><select id="exp-category"><option>Gas</option><option>Food &amp; drink</option><option>Bills &amp; insurance</option><option>Cards &amp; hobbies</option><option>Health &amp; personal</option><option>Tickets &amp; events</option><option>Investments</option><option>Other</option></select></div>
+        </div>
+        <p class="muted">Investment transfers are not counted as spending. They show up under Invested.</p>
+        <button type="submit">Add expense</button>
+      </form>
+    </div>
+    <div class="card">
+      <h2>Spending totals</h2>
+      <div class="row no-print">
+        <div><label for="spend-period">Period</label><select id="spend-period"><option value="week">This week</option><option value="month" selected>This month</option><option value="quarter">This quarter</option><option value="6mo">Last 6 months</option><option value="year">Last 12 months</option><option value="ytd">Year to date</option></select></div>
+      </div>
+      <div class="grid" style="margin-top:12px">
+        <div class="stat"><div class="label">Total</div><div class="value" id="sp-total">$0.00</div></div>
+        <div class="stat"><div class="label">Ex-investments</div><div class="value" id="sp-ex">$0.00</div></div>
+        <div class="stat"><div class="label">Invested</div><div class="value" id="sp-inv">$0.00</div></div>
+        <div class="stat"><div class="label">Gas</div><div class="value" id="sp-gas">$0.00</div></div>
+      </div>
+      <h3>By category</h3>
+      <div id="sp-categories"><p class="empty">No spending yet.</p></div>
+      <h3>Entries</h3>
+      <div id="expense-list"><p class="empty">No expenses yet — add your first one above.</p></div>
+    </div>
+  </section>
+
+  <section class="tab" id="tab-portfolio">
+    <div class="card">
+      <h2>Log a day's gain / loss</h2>
+      <form id="gain-form">
+        <div class="row">
+          <div><label for="gain-date">Date</label><input type="date" id="gain-date" required></div>
+          <div><label for="gain-amount">Gain / loss ($)</label><input type="number" id="gain-amount" step="0.01" required></div>
+          <div><label for="gain-estimate">Estimate?</label><select id="gain-estimate"><option value="no">No — actual</option><option value="yes">Yes — estimate</option></select></div>
+        </div>
+        <div><label for="gain-note">Note (optional)</label><input id="gain-note" placeholder="e.g. Estimate, between 180 and 185"></div>
+        <p style="margin-top:10px"><button type="submit">Save day</button></p>
+      </form>
+      <h3>Month-start portfolio value</h3>
+      <p class="muted">Needed to work out your % gain. Set it once per month.</p>
+      <form id="monthstart-form" class="row">
+        <div><label for="ms-date">Month</label><input type="month" id="ms-date" required></div>
+        <div><label for="ms-value">Value at month start ($)</label><input type="number" id="ms-value" step="0.01" min="0" required></div>
+        <div><button type="submit">Save</button></div>
+      </form>
+    </div>
+    <div class="card">
+      <h2>Monthly totals</h2>
+      <div id="gain-months"><p class="empty">No daily gains logged yet.</p></div>
+    </div>
+    <div class="card">
+      <h2>You vs benchmarks</h2>
+      <p class="muted">Fetched on demand from Yahoo Finance (public chart data for VOO, DIA for the Dow, ^IXIC for the Nasdaq, and QQQ). Benchmarks are real market data, not entered by hand — but see the note below.</p>
+      <p><button id="fetch-benchmarks" class="secondary">Fetch benchmarks for this month</button></p>
+      <div id="benchmarks"><p class="empty">No benchmarks fetched yet for this month.</p></div>
+      <p class="muted" id="benchmark-note">Limitation, stated honestly: Yahoo Finance often blocks direct browser requests (CORS), so this fetch may fail in some browsers. If it fails, the app says so and shows nothing invented — check the benchmark return yourself that month instead. Your own % gain is always calculated from your logged gains and your month-start value, and does not depend on the benchmark fetch.</p>
+    </div>
+    <div class="card">
+      <h2>Daily entries</h2>
+      <div id="gain-list"><p class="empty">No daily gains yet.</p></div>
+    </div>
+  </section>
+
+  <section class="tab" id="tab-income">
+    <div class="card">
+      <h2>Add income</h2>
+      <form id="income-form">
+        <div class="row">
+          <div><label for="inc-date">Date earned</label><input type="date" id="inc-date"></div>
+          <div><label for="inc-amount">Amount ($)</label><input type="number" id="inc-amount" step="0.01" min="0" required></div>
+          <div><label for="inc-source">Source</label><select id="inc-source"><option>Paycheck</option><option>Tips</option><option>Birthday</option><option>Gift</option><option>Refund</option><option>Other</option><option>Not tracked</option></select></div>
+        </div>
+        <div><label><input type="checkbox" id="inc-date-known" checked style="width:auto"> I know the earning date</label></div>
+        <p class="muted">Untick "I know the earning date" if you don't know when it was earned. That income still counts toward YTD and all-time totals, but that month's Income and Kept will show "— / income dates not tracked" instead of a wrong monthly number.</p>
+        <button type="submit">Add income</button>
+      </form>
+    </div>
+    <div class="card">
+      <h2>Income totals</h2>
+      <div class="grid">
+        <div class="stat"><div class="label">Income YTD</div><div class="value" id="inc-ytd">$0.00</div></div>
+        <div class="stat"><div class="label">Spent YTD</div><div class="value" id="inc-spent-ytd">$0.00</div><div class="muted">ex-investments</div></div>
+        <div class="stat"><div class="label">Kept YTD</div><div class="value" id="inc-kept-ytd">$0.00</div></div>
+        <div class="stat"><div class="label">Total profit / loss</div><div class="value" id="inc-pl">$0.00</div><div class="muted">all time</div></div>
+      </div>
+      <h3>By source</h3>
+      <div id="inc-sources"><p class="empty">No income yet.</p></div>
+      <h3>Entries</h3>
+      <div id="income-list"><p class="empty">No income yet — add your first inflow above.</p></div>
+    </div>
+  </section>
+
+  <section class="tab" id="tab-goals">
+    <div class="card">
+      <h2>Add a goal</h2>
+      <form id="goal-form">
+        <div class="row">
+          <div><label for="goal-type">Goal type</label><select id="goal-type"><option value="spend_cap">Spend less than $X</option><option value="save_for">Save $X for…</option><option value="invest_by">Have $X invested by a date</option></select></div>
+          <div><label for="goal-title">For / label</label><input id="goal-title" placeholder="e.g. Monthly spending, New laptop"></div>
+          <div><label for="goal-amount">Amount ($)</label><input type="number" id="goal-amount" step="0.01" min="0" required></div>
+          <div><label for="goal-date">By date (for invest-by goals)</label><input type="date" id="goal-date"></div>
+        </div>
+        <button type="submit">Add goal</button>
+      </form>
+    </div>
+    <div class="card">
+      <h2>Coach — based on your own numbers</h2>
+      <p class="muted">No external AI call. These suggestions are calculated from your spending, income, and investing in this app.</p>
+      <div id="coach"><p class="empty">Add some spending and income first — the coach needs your numbers before it can suggest anything.</p></div>
+      <p><button id="coach-refresh" class="secondary">Refresh coach suggestions</button></p>
+    </div>
+    <div class="card">
+      <h2>Your goals</h2>
+      <div id="goal-list"><p class="empty">No goals yet — add your first one above.</p></div>
+    </div>
+  </section>
+
+  <section class="tab" id="tab-reports">
+    <div class="card">
+      <h2>Generate a report</h2>
+      <form id="report-form" class="row">
+        <div><label for="report-period">Period</label><select id="report-period"><option value="weekly">Weekly</option><option value="monthly" selected>Monthly</option><option value="3mo">3-month</option><option value="6mo">6-month</option><option value="12mo">12-month</option></select></div>
+        <div><label for="report-month">Month (for monthly)</label><input type="month" id="report-month"></div>
+        <div><button type="submit">Generate report</button></div>
+      </form>
+      <p class="muted">Reports are saved in the app, not emailed. Open one, then use your browser's Print / Save as PDF to keep a copy.</p>
+    </div>
+    <div class="card" id="report-view-card" hidden>
+      <h2 id="report-view-title">Report</h2>
+      <div id="report-view"></div>
+      <p class="no-print"><button class="secondary" onclick="window.print()">Print / save as PDF</button></p>
+    </div>
+    <div class="card">
+      <h2>Saved reports</h2>
+      <div id="report-list"><p class="empty">No reports saved yet.</p></div>
+    </div>
+  </section>
+
+  <section class="tab" id="tab-setup">
+    <div class="card">
+      <h2>Setup — Supabase connection</h2>
+      <p class="muted">Stack needs a Supabase project to store each user's data. Values entered here are stored only in this browser (localStorage). For the published site, the same two values go in <code>config.js</code> and in Cloudflare Pages → Environment variables. Never enter the service_role key — anon key only.</p>
+      <form id="setup-form">
+        <label for="setup-url">Supabase Project URL</label>
+        <input id="setup-url" placeholder="https://YOUR-PROJECT-REF.supabase.co">
+        <label for="setup-key">Supabase anon / public key</label>
+        <input id="setup-key" placeholder="YOUR_SUPABASE_ANON_KEY">
+        <p style="margin-top:10px"><button type="submit">Save connection</button>
+        <button type="button" class="secondary" id="setup-clear">Clear saved connection</button></p>
+      </form>
+      <p class="muted" id="setup-status">Not connected.</p>
+    </div>
+    <div class="card">
+      <h2>About Stack</h2>
+      <p>Stack — build your stack of spending, income, and investing, all in one place.</p>
+      <p class="muted">Free, for a small group of friends and family (3–10 people). No charges, no paywall, no ads. Each user only sees their own data — Row Level Security is on for every table. Your data is stored in your own Supabase project, not with Stack.</p>
+    </div>
+  </section>
+</main>
+<footer>Stack is free for a small group (3–10 people). No payment details are ever collected here. Supabase Free projects pause after about a week with too little database activity — data is kept and restored from the Supabase dashboard.</footer>
+<script type="module" src="app.js"></script>
+</body>
+</html>
