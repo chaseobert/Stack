@@ -198,7 +198,10 @@ function renderOverview() {
 function periodRows(rows, period) {
   const now = new Date(); const y = now.getFullYear();
   if (period === 'ytd') return inYear(rows, y);
-  const days = { week: 7, month: 31, quarter: 92, '6mo': 183, year: 365 }[period] || 31;
+  // "Month" means this calendar month (1st to today), not a rolling 31 days —
+  // otherwise a whole imported month stamped on its last day would leak in.
+  if (period === 'month') return rows.filter((r) => monthKey(r.date) === now.toISOString().slice(0, 7));
+  const days = { week: 7, quarter: 92, '6mo': 183, year: 365 }[period] || 31;
   const cut = new Date(now.getTime() - days * 86400000).toISOString().slice(0, 10);
   return rows.filter((r) => r.date >= cut);
 }
