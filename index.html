@@ -21,6 +21,7 @@
   <button data-tab="income">Income</button>
   <button data-tab="goals">Goals</button>
   <button data-tab="reports">Reports</button>
+  <button data-tab="import">Import</button>
   <button data-tab="setup">Setup</button>
 </nav>
 <main>
@@ -212,6 +213,23 @@
     <div class="card">
       <h2>Saved reports</h2>
       <div id="report-list"><p class="empty">No reports saved yet.</p></div>
+    </div>
+  </section>
+
+  <section class="tab" id="tab-import">
+    <div class="card">
+      <h2>Import from a CSV file</h2>
+      <p class="muted">You must be signed in — imported rows go into your account only. Import each file once: importing the same file again will duplicate expenses and income. Daily gains are different — importing the same date again updates that day instead of duplicating it.</p>
+      <div class="row">
+        <div><label for="import-type">What is in the file?</label><select id="import-type"><option value="expenses">Expenses</option><option value="incomes">Income</option><option value="daily_gains">Daily gains</option></select></div>
+        <div><label for="import-file">CSV file</label><input type="file" id="import-file" accept=".csv,text/csv"></div>
+      </div>
+      <p style="margin-top:10px"><button type="button" id="import-btn">Import file</button></p>
+      <p class="muted" id="import-result"></p>
+      <h3>File formats (first row is the header)</h3>
+      <p class="muted">Expenses — <code>date,label,amount,category,kind</code><br>e.g. <code>2026-10-31,Gas (20th),69.45,Gas,expense</code> — kind is <code>expense</code> or <code>investment</code>, date is YYYY-MM-DD, amount is dollars.</p>
+      <p class="muted">Income — <code>date,amount,source,note,date_known</code><br>e.g. <code>2026-11-11,20.00,Not tracked,Past income — date not tracked,false</code> — date_known is <code>true</code> or <code>false</code>.</p>
+      <p class="muted">Daily gains — <code>date,amount,note,is_estimate</code><br>e.g. <code>2026-11-10,-63.78,,false</code> — amount can be negative, is_estimate is <code>true</code> or <code>false</code>.</p>
     </div>
   </section>
 
