@@ -75,8 +75,14 @@ async function doAuth(mode) {
   const email = ($('auth-email').value || '').trim();
   const password = $('auth-password').value || '';
   if (!email || !password) { showError('Enter an email and password first.'); return; }
-  const fn = mode === 'signup' ? supabase.auth.signUp : supabase.auth.signInWithPassword;
-  const { data, error } = await fn({ email, password });
+  let data, error;
+  try {
+    // Call the auth methods directly on supabase.auth — do not pull them
+    // into a separate variable first, or they lose their context and fail
+    // silently with no error shown.
+    if (mode === 'signup') ({ data, error } = await supabase.auth.signUp({ email, password }));
+    else ({ data, error } = await supabase.auth.signInWithPassword({ email, password }));
+  } catch (e) { showError(e && e.message ? e.message : String(e)); return; }
   if (error) { showError(error.message); return; }
   if (mode === 'signup' && data && data.user && !data.session) {
     showNotice('Account created — check your email to confirm it, then log in. (If email confirmation is off in Supabase Auth settings, you can log in right away.)');
